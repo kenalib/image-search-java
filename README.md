@@ -7,10 +7,10 @@
 ### Prepare image search environment variables
 
 ```bash
-REGION_ID=ap-southeast-1
-ACCESS_KEY_ID=XXXXXXXXXXXXXXXX
-ACCESS_KEY_SECRET=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-INSTANCE_NAME=tesuto
+export REGION_ID=ap-southeast-1
+export ACCESS_KEY_ID=XXXXXXXXXXXXXXXX
+export ACCESS_KEY_SECRET=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+export INSTANCE_NAME=your_instance_name
 ```
 
 ### Create WAR file
