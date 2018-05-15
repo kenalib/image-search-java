@@ -1,0 +1,13 @@
+version: '3'
+services:
+  web:
+    build: .
+    image: my-tomcat
+    container_name: image-search-webapp
+    ports: 
+      - "80:8080"
+    environment:    # import env vars from terminal env vars
+      - REGION_ID
+      - ACCESS_KEY_ID
+      - ACCESS_KEY_SECRET
+      - INSTANCE_NAME
