@@ -66,7 +66,7 @@ public class HelloServlet extends HttpServlet {
     private void respondAuctionJson(HttpServletResponse resp, List<SearchItemResponse.Auction> auctions) throws IOException {
         resp.setContentType("application/json");
         resp.setCharacterEncoding("utf-8");
-        resp.setHeader("Access-Control-Allow-Origin", "*");
+        resp.setHeader("Access-Control-Allow-Origin", "http://image-search-demo2.oss-ap-southeast-1.aliyuncs.com");
 
         resp.getWriter().write(gson.toJson(
                 Collections.singletonMap("Auctions", auctions)
