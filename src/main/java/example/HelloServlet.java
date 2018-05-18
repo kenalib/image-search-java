@@ -25,6 +25,7 @@ public class HelloServlet extends HttpServlet {
     private static final Gson gson = new Gson();
     static final int MAX_FILE_SIZE = 1024 * 1024 * 2;       // 2MB
     static final int MAX_REQUEST_SIZE = 1024 * 1024 * 8;    // 8MB
+    private static final String CORS_URL = "http://image-search-demo3.oss-ap-northeast-1.aliyuncs.com";
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -66,7 +67,7 @@ public class HelloServlet extends HttpServlet {
     private void respondAuctionJson(HttpServletResponse resp, List<SearchItemResponse.Auction> auctions) throws IOException {
         resp.setContentType("application/json");
         resp.setCharacterEncoding("utf-8");
-        resp.setHeader("Access-Control-Allow-Origin", "http://image-search-demo2.oss-ap-southeast-1.aliyuncs.com");
+        resp.setHeader("Access-Control-Allow-Origin", CORS_URL);
 
         resp.getWriter().write(gson.toJson(
                 Collections.singletonMap("Auctions", auctions)
