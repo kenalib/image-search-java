@@ -1,6 +1,10 @@
 
 # Image Search Java Sample Web API
 
+## Sample UI
+
+* http://image-search-demo3.oss-ap-northeast-1.aliyuncs.com/
+* (Backend API service suspended after test account expiry)
 
 ## Development
 
@@ -128,3 +132,4 @@ apt-get install docker-ce=18.03.1~ce-0~ubuntu
 
 * https://www.alibabacloud.com/help/doc-detail/71238.htm
 * https://docs.docker.com/install/linux/docker-ce/ubuntu/
+* https://github.com/kenalib/image-search-react
