@@ -11,6 +11,9 @@ import com.aliyuncs.profile.IClientProfile;
 import java.util.List;
 
 class ImageSearchDemo {
+    private static final String PRODUCT = "ImageSearch";
+    private static final String DEFAULT_ENDPOINT = "ap-southeast-1";
+    private static final String DEFAULT_DOMAIN = "imagesearch.ap-southeast-1.aliyuncs.com";
     private String accessKeyId;
     private String accessKeySecret;
     private String instanceName;
@@ -24,8 +27,8 @@ class ImageSearchDemo {
         this.accessKeySecret = System.getenv("ACCESS_KEY_SECRET");
         this.instanceName = System.getenv("INSTANCE_NAME");
         this.regionId = System.getenv("REGION_ID");   // e.g. "ap-southeast-1";
-        this.endpointName = getenv("ENDPOINT_NAME", "ap-southeast-1");
-        this.domain = getenv("DOMAIN", "imagesearch.ap-southeast-1.aliyuncs.com");
+        this.endpointName = getenv("ENDPOINT_NAME", DEFAULT_ENDPOINT);
+        this.domain = getenv("DOMAIN", DEFAULT_DOMAIN);
 
         try {
             initClient();
@@ -43,13 +46,17 @@ class ImageSearchDemo {
                 regionId, accessKeyId, accessKeySecret);
 
         // add user-defined endpoint
-        DefaultProfile.addEndpoint(endpointName, regionId, "ImageSearch", domain);
+        DefaultProfile.addEndpoint(endpointName, regionId, PRODUCT, domain);
 
         client = new DefaultAcsClient(profile);
     }
 
     SearchItemResponse searchPicture(byte[] bytes) {
-        SearchItemRequest request = createSearchItemRequest();
+        return searchPicture(bytes, "");
+    }
+
+    SearchItemResponse searchPicture(byte[] bytes, String catId) {
+        SearchItemRequest request = createSearchItemRequest(catId);
 
         request.setSearchPicture(bytes);
 
@@ -71,13 +78,20 @@ class ImageSearchDemo {
         return response;
     }
 
-    private SearchItemRequest createSearchItemRequest() {
+    private SearchItemRequest createSearchItemRequest(String catId) {
         SearchItemRequest request = new SearchItemRequest();
 
         request.setInstanceName(instanceName);
         request.setNum(12);
         request.setStart(0);
-        request.setCatId("8");
+
+        // same logic as in SearchItemRequest.buildPostContent()
+        if (catId != null && catId.length() > 0) {
+            System.out.println("CATEGORY SET: " + catId);
+            request.setCatId(catId);
+        } else {
+            System.out.println("CATEGORY NOT SET");
+        }
 
         return request;
     }

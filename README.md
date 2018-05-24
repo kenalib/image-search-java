@@ -4,7 +4,7 @@
 ## Sample UI
 
 * http://image-search-demo3.oss-ap-northeast-1.aliyuncs.com/
-* (Backend API service suspended after test account expiry)
+* (This is just UI for demo, the backend API service maybe suspended.)
 
 ## Development
 
@@ -16,6 +16,15 @@ export ACCESS_KEY_ID=XXXXXXXXXXXXXXXX
 export ACCESS_KEY_SECRET=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 export INSTANCE_NAME=your_instance_name
 ```
+
+### Prepare images
+
+* c.f. https://www.alibabacloud.com/help/doc-detail/66580.htm
+* upload your image files and `increment.meta` on your OSS bucket
+* setup RAM role and copy ARN in the `ImageSearchOSSAccessRole`
+* open Image Search instance and import the images from OSS
+* if needed, select `Reset` before OSS import to clear existing data
+* click manage to check OSS Import status to be `Imported`
 
 ### Create WAR file
 
@@ -29,7 +38,7 @@ mvn package
 ```bash
 mvn tomcat7:run
 # GET returns default result
-open http://localhost:8080/image-search-webapp/search_picture
+curl http://localhost:8080/image-search-webapp/search_picture | python -m json.tool
 # POST from form
 open http://localhost:8080/image-search-webapp/check.html
 ```
@@ -87,7 +96,7 @@ docker-compose up -d
 docker-compose ps
 docker-compose logs -f web
 IP=$(docker-machine ip image-search-webapp)
-open http://${IP}/image-search-webapp/search_picture
+curl http://${IP}/image-search-webapp/search_picture | python -m json.tool
 open http://${IP}/image-search-webapp/check.html
 # ssh to the machine for debug
 docker-machine ssh image-search-webapp
@@ -108,7 +117,7 @@ docker-machine rm image-search-webapp
 
 ## Note
 
-* `@WebServlet("/search_picture")` により `WEB-INF/web.xml` の servlet 定義は省略可能。
+* `@WebServlet("/search_picture")` により `WEB-INF/web.xml` の servlet 定義は不要。
 
 ### Maven project from scratch
 

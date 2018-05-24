@@ -2,6 +2,7 @@ package example;
 
 import com.aliyuncs.imagesearch.model.v20180319.SearchItemResponse;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.apache.commons.io.IOUtils;
 
 import javax.servlet.ServletException;
@@ -14,7 +15,6 @@ import javax.servlet.http.Part;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
-import java.util.List;
 
 import static example.HelloServlet.MAX_FILE_SIZE;
 import static example.HelloServlet.MAX_REQUEST_SIZE;
@@ -22,10 +22,10 @@ import static example.HelloServlet.MAX_REQUEST_SIZE;
 @WebServlet("/search_picture")
 @MultipartConfig(maxFileSize = MAX_FILE_SIZE, maxRequestSize = MAX_REQUEST_SIZE)
 public class HelloServlet extends HttpServlet {
-    private static final Gson gson = new Gson();
+    private static final Gson prettyGson = new GsonBuilder().setPrettyPrinting().create();
     static final int MAX_FILE_SIZE = 1024 * 1024 * 2;       // 2MB
     static final int MAX_REQUEST_SIZE = 1024 * 1024 * 8;    // 8MB
-    private static final String CORS_URL = "http://image-search-demo3.oss-ap-northeast-1.aliyuncs.com";
+    private static final String CORS_URL = "http://image-search-demo2.oss-ap-southeast-1.aliyuncs.com";
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -40,37 +40,48 @@ public class HelloServlet extends HttpServlet {
             return;
         }
 
-        searchPicture(resp, bytes);
+        String catId = req.getParameter("cat_id");  // can be null
+        System.out.println("INPUT POST catId: " + catId);
+
+        searchPicture(req, resp, bytes, catId);
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String fileName = "image_search_pictures/bottle15.jpeg";
+        String fileName = "image_search_pictures/bag02.jpg";
         byte[] bytes = Pictures.getBytesFromResource(fileName);
 
-        searchPicture(resp, bytes);
+        String catId = req.getParameter("cat_id");  // can be null
+        System.out.println("INPUT GET catId: " + catId);
+
+        searchPicture(req, resp, bytes, catId);
     }
 
-    private void searchPicture(HttpServletResponse resp, byte[] bytes) throws IOException {
+    private void searchPicture(HttpServletRequest req, HttpServletResponse resp, byte[] bytes, String catId) throws IOException {
         ImageSearchDemo demo = new ImageSearchDemo();
-        SearchItemResponse response = demo.searchPicture(bytes);
+        SearchItemResponse response = demo.searchPicture(bytes, catId);
 
         if (response == null) {
             resp.getWriter().write("ERR: response null");
             return;
         }
 
-        List<SearchItemResponse.Auction> auctions = response.getAuctions();
-        respondAuctionJson(resp, auctions);
+        boolean isLocal = req.getServerName().equals("localhost");
+        respondJson(resp, response, isLocal);
     }
 
-    private void respondAuctionJson(HttpServletResponse resp, List<SearchItemResponse.Auction> auctions) throws IOException {
+    private void respondJson(HttpServletResponse resp, SearchItemResponse response, boolean isLocal) throws IOException {
         resp.setContentType("application/json");
         resp.setCharacterEncoding("utf-8");
-        resp.setHeader("Access-Control-Allow-Origin", CORS_URL);
 
-        resp.getWriter().write(gson.toJson(
-                Collections.singletonMap("Auctions", auctions)
+        if (!isLocal) {
+            resp.setHeader("Access-Control-Allow-Origin", CORS_URL);
+        } else {
+            resp.setHeader("Access-Control-Allow-Origin", "*");
+        }
+
+        resp.getWriter().write(prettyGson.toJson(
+                Collections.singletonMap("SearchItemResponse", response)
         ));
     }
 }

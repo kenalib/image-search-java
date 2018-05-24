@@ -6,12 +6,51 @@
 </head>
 <body>
 
-<h1>Upload</h1>
+<h1>Image Search Test</h1>
 
 <form method="POST" enctype="multipart/form-data" action="./search_picture">
     <input type="file" name="file_name"/><br />
+    <select name="cat_id">
+        <option value="">Not specify</option>
+        <option value="0">0: Tops</option>
+        <option value="1">1: Dresses</option>
+        <option value="2">2: Bottoms</option>
+        <option value="3">3: Bags</option>
+        <option value="4">4: Shoes</option>
+        <option value="5">5: Accessories</option>
+        <option value="6">6: Snacks</option>
+        <option value="7">7: Makeup</option>
+        <option value="8">8: Bottle drinks</option>
+        <option value="9">9: Furniture</option>
+        <option value="20">20: Toys</option>
+        <option value="21">21: Underwears</option>
+        <option value="22">22: Digital devices</option>
+        <option value="88888888">88888888: Others</option>
+    </select><br/>
     <input type="submit" value="アップロード" />
 </form>
+
+<hr/>
+
+<h3>Image Search Reference</h3>
+
+<ul>
+    <li>Category
+        <a href="https://www.alibabacloud.com/help/doc-detail/66623.htm" target="_blank">
+            https://www.alibabacloud.com/help/doc-detail/66623.htm
+        </a>
+    </li>
+    <li>OSS import
+        <a href="https://www.alibabacloud.com/help/doc-detail/66580.htm" target="_blank">
+            https://www.alibabacloud.com/help/doc-detail/66580.htm
+        </a>
+    </li>
+    <li>Java SDK
+        <a href="https://www.alibabacloud.com/help/doc-detail/71238.htm" target="_blank">
+            https://www.alibabacloud.com/help/doc-detail/71238.htm
+        </a>
+    </li>
+</ul>
 
 </body>
 </html>
