@@ -25,7 +25,6 @@ public class HelloServlet extends HttpServlet {
     private static final Gson prettyGson = new GsonBuilder().setPrettyPrinting().create();
     static final int MAX_FILE_SIZE = 1024 * 1024 * 2;       // 2MB
     static final int MAX_REQUEST_SIZE = 1024 * 1024 * 8;    // 8MB
-    private static final String CORS_URL = System.getenv("CORS_URL");
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -43,7 +42,7 @@ public class HelloServlet extends HttpServlet {
         String catId = req.getParameter("cat_id");  // can be null
         System.out.println("INPUT POST catId: " + catId);
 
-        searchPicture(req, resp, bytes, catId);
+        searchPicture(resp, bytes, catId);
     }
 
     @Override
@@ -54,10 +53,10 @@ public class HelloServlet extends HttpServlet {
         String catId = req.getParameter("cat_id");  // can be null
         System.out.println("INPUT GET catId: " + catId);
 
-        searchPicture(req, resp, bytes, catId);
+        searchPicture(resp, bytes, catId);
     }
 
-    private void searchPicture(HttpServletRequest req, HttpServletResponse resp, byte[] bytes, String catId) throws IOException {
+    private void searchPicture(HttpServletResponse resp, byte[] bytes, String catId) throws IOException {
         ImageSearchDemo demo = new ImageSearchDemo();
         SearchItemResponse response = demo.searchPicture(bytes, catId);
 
@@ -66,22 +65,27 @@ public class HelloServlet extends HttpServlet {
             return;
         }
 
-        boolean isLocal = req.getServerName().equals("localhost");
-        respondJson(resp, response, isLocal);
+        respondJson(resp, response);
     }
 
-    private void respondJson(HttpServletResponse resp, SearchItemResponse response, boolean isLocal) throws IOException {
+    private void respondJson(HttpServletResponse resp, SearchItemResponse response) throws IOException {
         resp.setContentType("application/json");
         resp.setCharacterEncoding("utf-8");
-
-        if (!isLocal) {
-            resp.setHeader("Access-Control-Allow-Origin", CORS_URL);
-        } else {
-            resp.setHeader("Access-Control-Allow-Origin", "*");
-        }
+        resp.setHeader("Access-Control-Allow-Origin", getCorsURL());
 
         resp.getWriter().write(prettyGson.toJson(
                 Collections.singletonMap("SearchItemResponse", response)
         ));
+    }
+
+    private String getCorsURL() {
+        String CORS_URL = System.getenv("CORS_URL");
+
+        if (CORS_URL == null) {
+            System.out.println("CORS_URL not set, using * ...");
+            CORS_URL = "*";
+        }
+
+        return CORS_URL;
     }
 }
