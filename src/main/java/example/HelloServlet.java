@@ -25,7 +25,7 @@ public class HelloServlet extends HttpServlet {
     private static final Gson prettyGson = new GsonBuilder().setPrettyPrinting().create();
     static final int MAX_FILE_SIZE = 1024 * 1024 * 2;       // 2MB
     static final int MAX_REQUEST_SIZE = 1024 * 1024 * 8;    // 8MB
-    private static final String CORS_URL = "http://image-search-demo2.oss-ap-southeast-1.aliyuncs.com";
+    private static final String CORS_URL = System.getenv("CORS_URL");
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
