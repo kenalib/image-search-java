@@ -15,6 +15,7 @@ export REGION_ID=ap-southeast-1
 export ACCESS_KEY_ID=XXXXXXXXXXXXXXXX
 export ACCESS_KEY_SECRET=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 export INSTANCE_NAME=your_instance_name
+export CORS_URL=your_url    # for Access-Control-Allow-Origin
 ```
 
 ### Prepare images
