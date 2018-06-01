@@ -71,6 +71,17 @@ public class ImageSearchDemoTest {
     }
 
     @org.junit.Test
+    public void testSearchPictureSmall() {
+        fileName = "image_search_pictures/bag05.jpg";
+        byte[] bytes = Pictures.getBytesFromResource(fileName);
+
+        SearchItemResponse response = demo.searchPicture(bytes);
+
+        assertEquals(response.getSuccess(), false);
+        assertTrue(response.getMessage().startsWith("UnsupportedPicPixels"));
+    }
+
+    @org.junit.Test
     public void testSearchPictureEmpty() {
         byte[] bytes = new byte[0];
 
