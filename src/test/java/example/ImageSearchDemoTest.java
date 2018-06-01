@@ -76,6 +76,7 @@ public class ImageSearchDemoTest {
 
         SearchItemResponse response = demo.searchPicture(bytes);
 
-        assertNull(response);
+        assertEquals(response.getSuccess(), false);
+        assertEquals(response.getMessage(), "request.buildPostContent() failed.");
     }
 }

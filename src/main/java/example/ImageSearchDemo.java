@@ -57,22 +57,33 @@ class ImageSearchDemo {
 
     SearchItemResponse searchPicture(byte[] bytes, String catId) {
         SearchItemRequest request = createSearchItemRequest(catId);
+        SearchItemResponse response;
 
         request.setSearchPicture(bytes);
 
         if (!request.buildPostContent()) {
-            System.out.println("build post content failed.");
-            return null;
-        }
+            String message = "request.buildPostContent() failed.";
+            System.out.println(message);
 
-        SearchItemResponse response;
+            response = new SearchItemResponse();
+            response.setSuccess(false);
+            response.setMessage(message);
+
+            return response;
+        }
 
         try {
             response = client.getAcsResponse(request);
             printResponse(response);
         } catch (ClientException e) {
+            // [possible error] com.aliyuncs.exceptions.ClientException:
+            // UnsupportedPicPixels : Unsupported picture pixels.
             e.printStackTrace();
-            return null;
+
+            response = new SearchItemResponse();
+            response.setSuccess(false);
+            response.setRequestId(e.getRequestId());
+            response.setMessage(e.getMessage());
         }
 
         return response;
