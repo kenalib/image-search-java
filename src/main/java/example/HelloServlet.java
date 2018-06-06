@@ -73,6 +73,10 @@ public class HelloServlet extends HttpServlet {
         resp.setCharacterEncoding("utf-8");
         resp.setHeader("Access-Control-Allow-Origin", getCorsURL());
 
+        if (!response.getSuccess()) {
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        }
+
         resp.getWriter().write(prettyGson.toJson(
                 Collections.singletonMap("SearchItemResponse", response)
         ));

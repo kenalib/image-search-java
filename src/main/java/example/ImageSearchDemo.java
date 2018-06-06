@@ -12,6 +12,7 @@ import java.util.List;
 
 class ImageSearchDemo {
     private static final String PRODUCT = "ImageSearch";
+    private static final String DEFAULT_REGION_ID = "ap-southeast-1";
     private static final String DEFAULT_ENDPOINT = "ap-southeast-1";
     private static final String DEFAULT_DOMAIN = "imagesearch.ap-southeast-1.aliyuncs.com";
     private String accessKeyId;
@@ -25,8 +26,8 @@ class ImageSearchDemo {
     ImageSearchDemo() {
         this.accessKeyId = System.getenv("ACCESS_KEY_ID");
         this.accessKeySecret = System.getenv("ACCESS_KEY_SECRET");
-        this.instanceName = System.getenv("INSTANCE_NAME");
-        this.regionId = System.getenv("REGION_ID");   // e.g. "ap-southeast-1";
+        this.regionId = getenv("REGION_ID", DEFAULT_REGION_ID);
+        this.instanceName = ImageSearchProperties.getInstanceName();
         this.endpointName = getenv("ENDPOINT_NAME", DEFAULT_ENDPOINT);
         this.domain = getenv("DOMAIN", DEFAULT_DOMAIN);
 
@@ -132,6 +133,12 @@ class ImageSearchDemo {
 
     private String getenv(String name, String def) {
         String env = System.getenv(name);
-        return (env == null) ? def : env;
+
+        if (env == null) {
+            System.out.println("USING DEFAULT: " + name + " " + def);
+            return def;
+        } else {
+            return env;
+        }
     }
 }
