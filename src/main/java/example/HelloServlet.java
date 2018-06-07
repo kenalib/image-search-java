@@ -22,6 +22,7 @@ import static example.HelloServlet.MAX_REQUEST_SIZE;
 @WebServlet("/search_picture")
 @MultipartConfig(maxFileSize = MAX_FILE_SIZE, maxRequestSize = MAX_REQUEST_SIZE)
 public class HelloServlet extends HttpServlet {
+    private static final Properties props = new Properties("image-search.properties");
     private static final Gson prettyGson = new GsonBuilder().setPrettyPrinting().create();
     static final int MAX_FILE_SIZE = 1024 * 1024 * 2;       // 2MB
     static final int MAX_REQUEST_SIZE = 1024 * 1024 * 8;    // 8MB
@@ -71,7 +72,7 @@ public class HelloServlet extends HttpServlet {
     private void respondJson(HttpServletResponse resp, SearchItemResponse response) throws IOException {
         resp.setContentType("application/json");
         resp.setCharacterEncoding("utf-8");
-        resp.setHeader("Access-Control-Allow-Origin", getCorsURL());
+        resp.setHeader("Access-Control-Allow-Origin", props.get("CORS_URL"));
 
         if (!response.getSuccess()) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -80,16 +81,5 @@ public class HelloServlet extends HttpServlet {
         resp.getWriter().write(prettyGson.toJson(
                 Collections.singletonMap("SearchItemResponse", response)
         ));
-    }
-
-    private String getCorsURL() {
-        String CORS_URL = System.getenv("CORS_URL");
-
-        if (CORS_URL == null) {
-            System.out.println("CORS_URL not set, using * ...");
-            CORS_URL = "*";
-        }
-
-        return CORS_URL;
     }
 }

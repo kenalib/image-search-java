@@ -11,25 +11,29 @@ import com.aliyuncs.profile.IClientProfile;
 import java.util.List;
 
 class ImageSearchDemo {
-    private static final String PRODUCT = "ImageSearch";
-    private static final String DEFAULT_REGION_ID = "ap-southeast-1";
-    private static final String DEFAULT_ENDPOINT = "ap-southeast-1";
-    private static final String DEFAULT_DOMAIN = "imagesearch.ap-southeast-1.aliyuncs.com";
     private String accessKeyId;
     private String accessKeySecret;
+    private String product;
     private String instanceName;
     private String regionId;
     private String endpointName;
     private String domain;
+    private String connectTimeout;
+    private String readTimeout;
     private IAcsClient client;
 
     ImageSearchDemo() {
         this.accessKeyId = System.getenv("ACCESS_KEY_ID");
         this.accessKeySecret = System.getenv("ACCESS_KEY_SECRET");
-        this.regionId = getenv("REGION_ID", DEFAULT_REGION_ID);
-        this.instanceName = ImageSearchProperties.getInstanceName();
-        this.endpointName = getenv("ENDPOINT_NAME", DEFAULT_ENDPOINT);
-        this.domain = getenv("DOMAIN", DEFAULT_DOMAIN);
+
+        Properties props = new Properties("image-search.properties");
+        this.product = props.get("PRODUCT");
+        this.regionId = props.get("REGION_ID");
+        this.instanceName = props.get("INSTANCE_NAME");
+        this.endpointName = props.get("ENDPOINT_NAME");
+        this.domain = props.get("DOMAIN");
+        this.connectTimeout = props.get("ConnectTimeout");
+        this.readTimeout = props.get("ReadTimeout");
 
         try {
             initClient();
@@ -40,14 +44,14 @@ class ImageSearchDemo {
 
     private void initClient() throws ClientException {
         // set client end time-out
-        System.setProperty("sun.net.client.defaultConnectTimeout", "10000");
-        System.setProperty("sun.net.client.defaultReadTimeout", "10000");
+        System.setProperty("sun.net.client.defaultConnectTimeout", connectTimeout);
+        System.setProperty("sun.net.client.defaultReadTimeout", readTimeout);
 
         IClientProfile profile = DefaultProfile.getProfile(
                 regionId, accessKeyId, accessKeySecret);
 
         // add user-defined endpoint
-        DefaultProfile.addEndpoint(endpointName, regionId, PRODUCT, domain);
+        DefaultProfile.addEndpoint(endpointName, regionId, product, domain);
 
         client = new DefaultAcsClient(profile);
     }
@@ -129,16 +133,5 @@ class ImageSearchDemo {
         List<SearchItemResponse.Auction> auctions = response.getAuctions();
 
         System.out.println("Auctions.size(): " + auctions.size());
-    }
-
-    private String getenv(String name, String def) {
-        String env = System.getenv(name);
-
-        if (env == null) {
-            System.out.println("USING DEFAULT: " + name + " " + def);
-            return def;
-        } else {
-            return env;
-        }
     }
 }
