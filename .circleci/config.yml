@@ -53,9 +53,8 @@ jobs:
         name: setup docker-machine
         command: |
           set -x
-          mkdir -p ~/.docker/machine/machines/image-search-webapp
-          echo $DOCKER_CA_PEM | sed -e 's/\s\+/\n/g' \
-            > ~/.docker/machine/machines/image-search-webapp/ca.pem
+          mkdir -p $DOCKER_CERT_PATH
+          echo $DOCKER_CA_PEM | sed -e 's/\s\+/\n/g' > $DOCKER_CERT_PATH/ca.pem
       - run:
         name: docker-compose up -d --build
         command: docker-compose up -d --build
