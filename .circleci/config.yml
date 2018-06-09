@@ -41,7 +41,9 @@ jobs:
       - run: mvn integration-test
 
   deploy:
-    machine: true
+    docker:
+      - image: circleci/openjdk:8-jdk
+    working_directory: ~/repo
     environment:
       - DOCKER_TLS_VERIFY: "1"
       - DOCKER_HOST: "tcp://47.74.213.82:2376"
@@ -63,3 +65,7 @@ workflows:
       - deploy:
         requires:
           - build
+        filters:
+          branches:
+            only:
+              - master
