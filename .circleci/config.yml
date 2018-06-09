@@ -41,8 +41,7 @@ jobs:
       - run: mvn integration-test
 
   deploy:
-    docker:
-      - image: circleci/openjdk:8-jdk
+    machine: true
     working_directory: ~/repo
     environment:
       - DOCKER_TLS_VERIFY: "1"
@@ -72,6 +71,8 @@ jobs:
       - run: echo "-----BEGIN RSA PRIVATE KEY-----" > $DOCKER_CERT_PATH/key.pem
       - run: echo $DOCKER_KEY_PEM | tr " " "\n" >> $DOCKER_CERT_PATH/key.pem
       - run: echo "-----END RSA PRIVATE KEY-----" >> $DOCKER_CERT_PATH/key.pem
+
+      - run: ls -lrt $DOCKER_CERT_PATH
 
       - run: docker version
       - run: docker-compose version
