@@ -17,11 +17,8 @@ export ACCESS_KEY_SECRET=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 ```
 
 * update `INSTANCE_NAME` in `src/main/resources/image-search.properties`
-* (optional) set url for CORS setting (default is `*`)
+* (optional) update `CORS_URL` (default is `*`)
 
-```
-export CORS_URL=your_url    # for Access-Control-Allow-Origin
-```
 
 ### Prepare images
 

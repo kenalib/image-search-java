@@ -8,6 +8,10 @@ import com.aliyuncs.imagesearch.model.v20180319.SearchItemResponse;
 import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.profile.IClientProfile;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 class ImageSearchDemo {
@@ -20,6 +24,8 @@ class ImageSearchDemo {
     private String domain;
     private String connectTimeout;
     private String readTimeout;
+    private int imageWidth;
+    private String imageFormatName;
     private IAcsClient client;
 
     ImageSearchDemo() {
@@ -34,6 +40,8 @@ class ImageSearchDemo {
         this.domain = props.get("DOMAIN");
         this.connectTimeout = props.get("ConnectTimeout");
         this.readTimeout = props.get("ReadTimeout");
+        this.imageWidth = props.getInt("IMAGE_WIDTH");
+        this.imageFormatName = props.get("IMAGE_FORMAT_NAME");
 
         try {
             initClient();
@@ -56,6 +64,41 @@ class ImageSearchDemo {
         client = new DefaultAcsClient(profile);
     }
 
+    SearchItemResponse searchPictureWithResize(InputStream inputStream) {
+        return searchPictureWithResize(inputStream, "");
+    }
+
+    SearchItemResponse searchPictureWithResize(InputStream inputStream, String catId) {
+        byte[] bytes;
+
+        try {
+            if (inputStream.available() == 0) {
+                bytes = new byte[0];
+            } else {
+                BufferedImage bImage = ImageIO.read(inputStream);
+
+                int originalWidth = bImage.getWidth();
+                int originalHeight = bImage.getHeight();
+
+                // minimum size is 200px
+                // https://www.alibabacloud.com/help/doc-detail/66610.htm
+                if (originalWidth < 200 || originalHeight < 200 || originalWidth > imageWidth) {
+                    bImage = ImageUtil.resizeImage(bImage, imageWidth);
+                }
+
+                bytes = ImageUtil.bufferedImageToBytes(bImage, imageFormatName);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            String message = "ERR: image resize failed.";
+            System.out.println(message);
+
+            return createErrorResponse(message);
+        }
+
+        return searchPicture(bytes, catId);
+    }
+
     SearchItemResponse searchPicture(byte[] bytes) {
         return searchPicture(bytes, "");
     }
@@ -70,11 +113,7 @@ class ImageSearchDemo {
             String message = "request.buildPostContent() failed.";
             System.out.println(message);
 
-            response = new SearchItemResponse();
-            response.setSuccess(false);
-            response.setMessage(message);
-
-            return response;
+            return createErrorResponse(message);
         }
 
         try {
@@ -85,10 +124,8 @@ class ImageSearchDemo {
             // UnsupportedPicPixels : Unsupported picture pixels.
             e.printStackTrace();
 
-            response = new SearchItemResponse();
-            response.setSuccess(false);
+            response = createErrorResponse(e.getMessage());
             response.setRequestId(e.getRequestId());
-            response.setMessage(e.getMessage());
         }
 
         return response;
@@ -110,6 +147,14 @@ class ImageSearchDemo {
         }
 
         return request;
+    }
+
+    static SearchItemResponse createErrorResponse(String message) {
+        SearchItemResponse response = new SearchItemResponse();
+        response.setSuccess(false);
+        response.setMessage(message);
+
+        return response;
     }
 
     private void printResponse(SearchItemResponse response) {

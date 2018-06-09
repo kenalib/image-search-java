@@ -2,9 +2,12 @@ package example;
 
 import com.aliyuncs.imagesearch.model.v20180319.SearchItemResponse;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class ImageSearchDemoTest {
     private ImageSearchDemo demo;
@@ -51,7 +54,7 @@ public class ImageSearchDemoTest {
     }
 
     private void searchPicture(String fileName, String searchCat, String detectedCat, int auctionSize) {
-        byte[] bytes = Pictures.getBytesFromResource(fileName);
+        byte[] bytes = Resources.getBytes(fileName);
 
         SearchItemResponse response = demo.searchPicture(bytes, searchCat);
 
@@ -73,12 +76,22 @@ public class ImageSearchDemoTest {
     @org.junit.Test
     public void testSearchPictureSmall() {
         fileName = "image_search_pictures/bag05.jpg";
-        byte[] bytes = Pictures.getBytesFromResource(fileName);
+        byte[] bytes = Resources.getBytes(fileName);
 
         SearchItemResponse response = demo.searchPicture(bytes);
-
         assertEquals(response.getSuccess(), false);
         assertTrue(response.getMessage().startsWith("UnsupportedPicPixels"));
+    }
+
+    @org.junit.Test
+    public void testSearchPictureWithResize() {
+        fileName = "image_search_pictures/bag05.jpg";
+        byte[] bytes = Resources.getBytes(fileName);
+        InputStream is = new ByteArrayInputStream(bytes);
+
+        SearchItemResponse response = demo.searchPictureWithResize(is);
+        assertEquals(true, response.getSuccess());
+        assertEquals("success", response.getMessage());
     }
 
     @org.junit.Test
@@ -86,7 +99,6 @@ public class ImageSearchDemoTest {
         byte[] bytes = new byte[0];
 
         SearchItemResponse response = demo.searchPicture(bytes);
-
         assertEquals(response.getSuccess(), false);
         assertEquals(response.getMessage(), "request.buildPostContent() failed.");
     }
