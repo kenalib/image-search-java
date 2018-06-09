@@ -52,9 +52,19 @@ jobs:
     steps:
       - checkout
       - run: mkdir -p $DOCKER_CERT_PATH
+
       - run: echo "-----BEGIN CERTIFICATE-----" > $DOCKER_CERT_PATH/ca.pem
       - run: echo $DOCKER_CA_PEM | tr " " "\n" >> $DOCKER_CERT_PATH/ca.pem
       - run: echo "-----END CERTIFICATE-----" >> $DOCKER_CERT_PATH/ca.pem
+
+      - run: echo "-----BEGIN CERTIFICATE-----" > $DOCKER_CERT_PATH/cert.pem
+      - run: echo $DOCKER_CERT_PEM | tr " " "\n" >> $DOCKER_CERT_PATH/cert.pem
+      - run: echo "-----END CERTIFICATE-----" >> $DOCKER_CERT_PATH/cert.pem
+
+      - run: echo "-----BEGIN RSA PRIVATE KEY-----" > $DOCKER_CERT_PATH/key.pem
+      - run: echo $DOCKER_KEY_PEM | tr " " "\n" >> $DOCKER_CERT_PATH/key.pem
+      - run: echo "-----END RSA PRIVATE KEY-----" >> $DOCKER_CERT_PATH/key.pem
+
       - run: docker-compose up -d --build
 
 workflows:
