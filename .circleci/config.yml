@@ -42,7 +42,7 @@ jobs:
 
   deploy:
     docker:
-      - image: circleci/openjdk:8-jdk
+      - image: docker/compose:1.21.1
     working_directory: ~/repo
     environment:
       - DOCKER_TLS_VERIFY: "1"
@@ -51,6 +51,8 @@ jobs:
       - DOCKER_MACHINE_NAME: "image-search-webapp"
     steps:
       - checkout
+      - setup_remote_docker
+
       - run: mkdir -p $DOCKER_CERT_PATH
 
       - run: echo "-----BEGIN CERTIFICATE-----" > $DOCKER_CERT_PATH/ca.pem
@@ -64,6 +66,12 @@ jobs:
       - run: echo "-----BEGIN RSA PRIVATE KEY-----" > $DOCKER_CERT_PATH/key.pem
       - run: echo $DOCKER_KEY_PEM | tr " " "\n" >> $DOCKER_CERT_PATH/key.pem
       - run: echo "-----END RSA PRIVATE KEY-----" >> $DOCKER_CERT_PATH/key.pem
+
+      - run: sudo apt-get update && sudo apt-get install -y openssl
+
+      - run: docker version
+      - run: docker-compose version
+      - run: openssl version -a
 
       - run: docker-compose up -d --build
 
