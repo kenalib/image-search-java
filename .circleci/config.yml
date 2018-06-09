@@ -43,18 +43,24 @@ jobs:
   deploy:
     machine: true
     environment:
-      DOCKER_TLS_VERIFY: "1"
-      DOCKER_HOST: "tcp://47.74.213.82:2376"
-      DOCKER_CERT_PATH: "~/.docker/machine/machines/image-search-webapp"
-      DOCKER_MACHINE_NAME: "image-search-webapp"
+      - DOCKER_TLS_VERIFY: "1"
+      - DOCKER_HOST: "tcp://47.74.213.82:2376"
+      - DOCKER_CERT_PATH: "~/.docker/machine/machines/image-search-webapp"
+      - DOCKER_MACHINE_NAME: "image-search-webapp"
     steps:
       - checkout
       - run:
         name: mkdir
         command: mkdir -p $DOCKER_CERT_PATH
       - run:
-        name: setup docker-machine
-        command: echo $DOCKER_CA_PEM | sed -e 's/\s\+/\n/g' > $DOCKER_CERT_PATH/ca.pem
+        name: setup docker-machine 1
+        command: echo "-----BEGIN CERTIFICATE-----" > $DOCKER_CERT_PATH/ca.pem
+      - run:
+        name: setup docker-machine 2
+        command: echo $DOCKER_CA_PEM | tr " " "\n" >> $DOCKER_CERT_PATH/ca.pem
+      - run:
+        name: setup docker-machine 3
+        command: echo "-----END CERTIFICATE-----" >> $DOCKER_CERT_PATH/ca.pem
       - run:
         name: docker-compose up -d --build
         command: docker-compose up -d --build
