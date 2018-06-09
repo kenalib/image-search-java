@@ -39,3 +39,35 @@ jobs:
 
       # run tests!
       - run: mvn integration-test
+
+  deploy:
+    machine: true
+    environment:
+      DOCKER_TLS_VERIFY: "1"
+      DOCKER_HOST: "tcp://47.74.213.82:2376"
+      DOCKER_CERT_PATH: "~/.docker/machine/machines/image-search-webapp"
+      DOCKER_MACHINE_NAME: "image-search-webapp"
+    steps:
+      - checkout
+      - run:
+        name: setup docker-machine
+        command: |
+          set -x
+          mkdir -p ~/.docker/machine/machines/image-search-webapp
+          echo $DOCKER_CA_PEM | sed -e 's/\s\+/\n/g' \
+            > ~/.docker/machine/machines/image-search-webapp/ca.pem
+      - run:
+        name: docker-compose up -d --build
+        command: docker-compose up -d --build
+
+workflows:
+  version: 2
+  build_and_deploy:
+    jobs:
+      - build
+      - deploy:
+        requires:
+          - build
+        filters:
+          branches:
+            only: master
