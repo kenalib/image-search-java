@@ -50,11 +50,11 @@ jobs:
     steps:
       - checkout
       - run:
+        name: mkdir
+        command: mkdir -p $DOCKER_CERT_PATH
+      - run:
         name: setup docker-machine
-        command: |
-          set -x
-          mkdir -p $DOCKER_CERT_PATH
-          echo $DOCKER_CA_PEM | sed -e 's/\s\+/\n/g' > $DOCKER_CERT_PATH/ca.pem
+        command: echo $DOCKER_CA_PEM | sed -e 's/\s\+/\n/g' > $DOCKER_CERT_PATH/ca.pem
       - run:
         name: docker-compose up -d --build
         command: docker-compose up -d --build
