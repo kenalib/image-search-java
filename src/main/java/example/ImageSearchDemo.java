@@ -28,7 +28,7 @@ class ImageSearchDemo {
     private String imageFormatName;
     private IAcsClient client;
 
-    ImageSearchDemo() {
+    ImageSearchDemo() throws ClientException {
         this.accessKeyId = System.getenv("ACCESS_KEY_ID");
         this.accessKeySecret = System.getenv("ACCESS_KEY_SECRET");
 
@@ -43,11 +43,11 @@ class ImageSearchDemo {
         this.imageWidth = props.getInt("IMAGE_WIDTH");
         this.imageFormatName = props.get("IMAGE_FORMAT_NAME");
 
-        try {
-            initClient();
-        } catch (ClientException e) {
-            e.printStackTrace();
+        if (accessKeyId == null || accessKeySecret == null) {
+            throw new ClientException("ACCESS_KEY_ID ACCESS_KEY_SECRET null");
         }
+
+        initClient();
     }
 
     private void initClient() throws ClientException {

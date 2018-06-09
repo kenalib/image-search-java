@@ -1,5 +1,6 @@
 package example;
 
+import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.imagesearch.model.v20180319.SearchItemResponse;
 
 import java.io.ByteArrayInputStream;
@@ -17,7 +18,7 @@ public class ImageSearchDemoTest {
     private int auctionSize;
 
     @org.junit.Before
-    public void setUp() {
+    public void setUp() throws ClientException {
         demo = new ImageSearchDemo();
     }
 

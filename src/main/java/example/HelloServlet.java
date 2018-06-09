@@ -1,5 +1,6 @@
 package example;
 
+import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.imagesearch.model.v20180319.SearchItemResponse;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -60,8 +61,15 @@ public class HelloServlet extends HttpServlet {
     }
 
     private void searchPicture(HttpServletResponse resp, InputStream inputStream, String catId) throws IOException {
-        ImageSearchDemo demo = new ImageSearchDemo();
-        SearchItemResponse response = demo.searchPictureWithResize(inputStream, catId);
+        SearchItemResponse response;
+
+        try {
+            ImageSearchDemo demo = new ImageSearchDemo();
+            response = demo.searchPictureWithResize(inputStream, catId);
+        } catch (ClientException e) {
+            e.printStackTrace();
+            response = createErrorResponse(e.getMessage());
+        }
 
         respondJson(resp, response);
     }
