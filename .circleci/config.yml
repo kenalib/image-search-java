@@ -42,7 +42,7 @@ jobs:
 
   deploy:
     docker:
-      - image: docker/compose:1.21.1
+      - image: circleci/openjdk:8-jdk
     working_directory: ~/repo
     environment:
       - DOCKER_TLS_VERIFY: "1"
@@ -51,6 +51,13 @@ jobs:
       - DOCKER_MACHINE_NAME: "image-search-webapp"
     steps:
       - checkout
+
+      - run:
+          name: Install Docker Compose
+          command: |
+            curl -L https://github.com/docker/compose/releases/download/1.21.1/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
+            chmod +x ~/docker-compose
+            sudo mv ~/docker-compose /usr/local/bin/docker-compose
 
       - run: mkdir -p $DOCKER_CERT_PATH
 
