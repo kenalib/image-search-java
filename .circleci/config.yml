@@ -51,7 +51,6 @@ jobs:
       - DOCKER_MACHINE_NAME: "image-search-webapp"
     steps:
       - checkout
-      - setup_remote_docker
 
       - run: mkdir -p $DOCKER_CERT_PATH
 
@@ -66,8 +65,6 @@ jobs:
       - run: echo "-----BEGIN RSA PRIVATE KEY-----" > $DOCKER_CERT_PATH/key.pem
       - run: echo $DOCKER_KEY_PEM | tr " " "\n" >> $DOCKER_CERT_PATH/key.pem
       - run: echo "-----END RSA PRIVATE KEY-----" >> $DOCKER_CERT_PATH/key.pem
-
-      - run: sudo apt-get update && sudo apt-get install -y openssl
 
       - run: docker version
       - run: docker-compose version
