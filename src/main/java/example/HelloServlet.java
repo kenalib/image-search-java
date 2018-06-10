@@ -23,13 +23,21 @@ import static example.ImageSearchDemo.createErrorResponse;
 @WebServlet("/search_picture")
 @MultipartConfig(maxFileSize = MAX_FILE_SIZE, maxRequestSize = MAX_REQUEST_SIZE)
 public class HelloServlet extends HttpServlet {
+    private ImageSearchDemo demo;
     private static Properties props;
     private static final Gson prettyGson = new GsonBuilder().setPrettyPrinting().create();
+
     // max size 2MB https://www.alibabacloud.com/help/doc-detail/66610.htm
     static final int MAX_FILE_SIZE = 1024 * 1024 * 2;       // 2MB
     static final int MAX_REQUEST_SIZE = 1024 * 1024 * 8;    // 8MB
 
-    public HelloServlet() throws IOException {
+    public HelloServlet() throws IOException, ClientException {
+        demo = new ImageSearchDemo();
+        props = new Properties("image-search.properties");
+    }
+
+    public HelloServlet(ImageSearchDemo demo) throws IOException {
+        this.demo = demo;
         props = new Properties("image-search.properties");
     }
 
@@ -65,15 +73,7 @@ public class HelloServlet extends HttpServlet {
     }
 
     private void searchPicture(HttpServletResponse resp, InputStream inputStream, String catId) throws IOException {
-        SearchItemResponse response;
-
-        try {
-            ImageSearchDemo demo = new ImageSearchDemo();
-            response = demo.searchPictureWithResize(inputStream, catId);
-        } catch (ClientException e) {
-            e.printStackTrace();
-            response = createErrorResponse(e.getMessage());
-        }
+        SearchItemResponse response = demo.searchPictureWithResize(inputStream, catId);
 
         respondJson(resp, response);
     }

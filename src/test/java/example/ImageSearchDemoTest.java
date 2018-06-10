@@ -8,8 +8,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class ImageSearchDemoTest {
     private ImageSearchDemo demo;
@@ -116,5 +118,18 @@ public class ImageSearchDemoTest {
         SearchItemResponse response = demo.searchPicture(bytes);
         assertEquals(response.getSuccess(), false);
         assertEquals(response.getMessage(), "request.buildPostContent() failed.");
+    }
+
+    @org.junit.Test
+    public void doGetStartWithoutKey() throws IOException, ClientException {
+        Env mockEnv = mock(Env.class);
+        when(mockEnv.get(anyString())).thenReturn(null);
+
+        ImageSearchDemo demo = new ImageSearchDemo(mockEnv);
+
+        SearchItemResponse res = demo.searchPicture(new byte[0]);
+
+        assertFalse(res.getSuccess());
+        assertEquals("ACCESS_KEY_ID ACCESS_KEY_SECRET null", res.getMessage());
     }
 }

@@ -81,6 +81,7 @@ jobs:
       - run: openssl version -a
 
       - run: docker-compose --tlsverify --tlscacert=ca.pem --tlscert=cert.pem --tlskey=key.pem -H=$DOCKER_HOST up -d --build
+      - run: docker --tlsverify --tlscacert=ca.pem --tlscert=cert.pem --tlskey=key.pem -H=$DOCKER_HOST logs image-search-webapp
 
 workflows:
   version: 2

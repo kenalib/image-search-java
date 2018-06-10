@@ -17,15 +17,16 @@ import java.util.List;
 class ImageSearchDemo {
     private Properties props;
     private IAcsClient client;
+    private String accessKeyId ;
+    private String accessKeySecret;
 
-    ImageSearchDemo() throws ClientException, IOException {
-        String accessKeyId = System.getenv("ACCESS_KEY_ID");
-        String accessKeySecret = System.getenv("ACCESS_KEY_SECRET");
+    ImageSearchDemo() throws IOException, ClientException {
+        this(new Env());
+    }
 
-        if (accessKeyId == null || accessKeySecret == null) {
-            throw new ClientException("ACCESS_KEY_ID ACCESS_KEY_SECRET null");
-        }
-
+    ImageSearchDemo(Env env) throws ClientException, IOException {
+        accessKeyId = env.get("ACCESS_KEY_ID");
+        accessKeySecret = env.get("ACCESS_KEY_SECRET");
         this.props = new Properties("image-search.properties");
 
         // set client end time-out
@@ -92,6 +93,12 @@ class ImageSearchDemo {
     }
 
     SearchItemResponse searchPicture(byte[] bytes, String catId) {
+        // note: if accessKeyId is null, client will throw NullPointerException
+        if (accessKeyId == null || accessKeySecret == null) {
+            String message = "ACCESS_KEY_ID ACCESS_KEY_SECRET null";
+            return createErrorResponse(message);
+        }
+
         SearchItemRequest request = createSearchItemRequest(catId);
         SearchItemResponse response;
 
