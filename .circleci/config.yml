@@ -43,11 +43,6 @@ jobs:
   deploy:
     machine: true
     working_directory: ~/repo
-    environment:
-      - DOCKER_TLS_VERIFY: "1"
-      - DOCKER_HOST: "tcp://47.74.213.82:2376"
-      - DOCKER_CERT_PATH: "~/.docker/machine/machines/image-search-webapp"
-      - DOCKER_MACHINE_NAME: "image-search-webapp"
     steps:
       - checkout
 
@@ -58,27 +53,25 @@ jobs:
             chmod +x ~/docker-compose
             sudo mv ~/docker-compose /usr/local/bin/docker-compose
 
-      - run: mkdir -p $DOCKER_CERT_PATH
+      - run: echo "-----BEGIN CERTIFICATE-----" > ca.pem
+      - run: echo $DOCKER_CA_PEM | tr " " "\n" >> ca.pem
+      - run: echo "-----END CERTIFICATE-----" >> ca.pem
 
-      - run: echo "-----BEGIN CERTIFICATE-----" > $DOCKER_CERT_PATH/ca.pem
-      - run: echo $DOCKER_CA_PEM | tr " " "\n" >> $DOCKER_CERT_PATH/ca.pem
-      - run: echo "-----END CERTIFICATE-----" >> $DOCKER_CERT_PATH/ca.pem
+      - run: echo "-----BEGIN CERTIFICATE-----" > cert.pem
+      - run: echo $DOCKER_CERT_PEM | tr " " "\n" >> cert.pem
+      - run: echo "-----END CERTIFICATE-----" >> cert.pem
 
-      - run: echo "-----BEGIN CERTIFICATE-----" > $DOCKER_CERT_PATH/cert.pem
-      - run: echo $DOCKER_CERT_PEM | tr " " "\n" >> $DOCKER_CERT_PATH/cert.pem
-      - run: echo "-----END CERTIFICATE-----" >> $DOCKER_CERT_PATH/cert.pem
+      - run: echo "-----BEGIN RSA PRIVATE KEY-----" > key.pem
+      - run: echo $DOCKER_KEY_PEM | tr " " "\n" >> key.pem
+      - run: echo "-----END RSA PRIVATE KEY-----" >> key.pem
 
-      - run: echo "-----BEGIN RSA PRIVATE KEY-----" > $DOCKER_CERT_PATH/key.pem
-      - run: echo $DOCKER_KEY_PEM | tr " " "\n" >> $DOCKER_CERT_PATH/key.pem
-      - run: echo "-----END RSA PRIVATE KEY-----" >> $DOCKER_CERT_PATH/key.pem
-
-      - run: ls -lrt $DOCKER_CERT_PATH
+      - run: ls -lrt
 
       - run: docker version
       - run: docker-compose version
       - run: openssl version -a
 
-      - run: docker-compose up -d --build
+      - run: docker-compose --tlsverify --tlscacert=ca.pem --tlscert=cert.pem --tlskey=key.pem -H=$DOCKER_HOST up -d --build
 
 workflows:
   version: 2
