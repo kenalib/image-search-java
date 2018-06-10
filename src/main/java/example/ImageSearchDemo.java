@@ -15,51 +15,34 @@ import java.io.InputStream;
 import java.util.List;
 
 class ImageSearchDemo {
-    private String accessKeyId;
-    private String accessKeySecret;
-    private String product;
-    private String instanceName;
-    private String regionId;
-    private String endpointName;
-    private String domain;
-    private String connectTimeout;
-    private String readTimeout;
-    private int imageWidth;
-    private String imageFormatName;
+    private Properties props;
     private IAcsClient client;
 
     ImageSearchDemo() throws ClientException {
-        this.accessKeyId = System.getenv("ACCESS_KEY_ID");
-        this.accessKeySecret = System.getenv("ACCESS_KEY_SECRET");
-
-        Properties props = new Properties("image-search.properties");
-        this.product = props.get("PRODUCT");
-        this.regionId = props.get("REGION_ID");
-        this.instanceName = props.get("INSTANCE_NAME");
-        this.endpointName = props.get("ENDPOINT_NAME");
-        this.domain = props.get("DOMAIN");
-        this.connectTimeout = props.get("ConnectTimeout");
-        this.readTimeout = props.get("ReadTimeout");
-        this.imageWidth = props.getInt("IMAGE_WIDTH");
-        this.imageFormatName = props.get("IMAGE_FORMAT_NAME");
+        String accessKeyId = System.getenv("ACCESS_KEY_ID");
+        String accessKeySecret = System.getenv("ACCESS_KEY_SECRET");
 
         if (accessKeyId == null || accessKeySecret == null) {
             throw new ClientException("ACCESS_KEY_ID ACCESS_KEY_SECRET null");
         }
 
-        initClient();
-    }
+        this.props = new Properties("image-search.properties");
 
-    private void initClient() throws ClientException {
         // set client end time-out
-        System.setProperty("sun.net.client.defaultConnectTimeout", connectTimeout);
-        System.setProperty("sun.net.client.defaultReadTimeout", readTimeout);
+        System.setProperty("sun.net.client.defaultConnectTimeout", props.get("ConnectTimeout"));
+        System.setProperty("sun.net.client.defaultReadTimeout", props.get("ReadTimeout"));
 
         IClientProfile profile = DefaultProfile.getProfile(
-                regionId, accessKeyId, accessKeySecret);
+                props.get("REGION_ID"), accessKeyId, accessKeySecret
+        );
 
         // add user-defined endpoint
-        DefaultProfile.addEndpoint(endpointName, regionId, product, domain);
+        DefaultProfile.addEndpoint(
+                props.get("ENDPOINT_NAME"),
+                props.get("REGION_ID"),
+                props.get("PRODUCT"),
+                props.get("DOMAIN")
+        );
 
         client = new DefaultAcsClient(profile);
     }
@@ -79,6 +62,9 @@ class ImageSearchDemo {
 
                 int originalWidth = bImage.getWidth();
                 int originalHeight = bImage.getHeight();
+
+                int imageWidth = props.getInt("IMAGE_WIDTH");
+                String imageFormatName = props.get("IMAGE_FORMAT_NAME");
 
                 // minimum size is 200px
                 // https://www.alibabacloud.com/help/doc-detail/66610.htm
@@ -133,6 +119,7 @@ class ImageSearchDemo {
 
     private SearchItemRequest createSearchItemRequest(String catId) {
         SearchItemRequest request = new SearchItemRequest();
+        String instanceName = props.get("INSTANCE_NAME");
 
         request.setInstanceName(instanceName);
         request.setNum(12);
