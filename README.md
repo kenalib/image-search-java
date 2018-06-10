@@ -6,11 +6,15 @@ CircleCI Status:
 [![CircleCI](https://circleci.com/gh/kenalib/image-search-java.svg?style=svg)](https://circleci.com/gh/kenalib/image-search-java)
 
 
-## Sample UI
+## Sample UI and code
 
-* https://github.com/kenalib/image-search-react
-* http://image-search-demo3.oss-ap-northeast-1.aliyuncs.com/
-* (This is just UI for demo, the backend API service maybe suspended.)
+* UI Demo: http://image-search-demo3.oss-ap-northeast-1.aliyuncs.com/
+* Front End: https://github.com/kenalib/image-search-react
+* Back End: https://github.com/kenalib/image-search-java
+
+* CI status: https://circleci.com/gh/kenalib/image-search-java
+* Test coverage report: https://kenalib.github.io/image-search-java/coverage_report/
+
 
 ## Development
 
@@ -24,7 +28,6 @@ export ACCESS_KEY_SECRET=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 * update `INSTANCE_NAME` in `src/main/resources/image-search.properties`
 * (optional) update `CORS_URL` (default is `*`)
 
-
 ### Prepare images
 
 * c.f. https://www.alibabacloud.com/help/doc-detail/66580.htm
@@ -34,7 +37,7 @@ export ACCESS_KEY_SECRET=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 * if needed, select `Reset` before OSS import to clear existing data
 * click manage to check OSS Import status to be `Imported`
 
-### Create WAR file
+### Test and build
 
 ```bash
 mvn test
@@ -43,6 +46,9 @@ mvn package
 # this will skip test
 mvn package -DskipTests
 ```
+
+* Test coverage report by using IntelliJ IDEA is below.
+* https://kenalib.github.io/image-search-java/coverage_report/
 
 ### Run Tomcat locally
 
@@ -57,6 +63,7 @@ open http://localhost:8080/image-search-webapp/check.html
 ### Run Tomcat by Docker
 
 ```bash
+# Test
 docker-compose -f docker-compose.test.yml run web mvn test
 ```
 
@@ -103,7 +110,7 @@ docker-machine ls
 
 * in case failed, try `docker-machine rm -f image-search-webapp`
 
-### Run Tomcat remotely
+### Run Tomcat on remote Docker
 
 ```bash
 eval $(docker-machine env image-search-webapp)
@@ -122,19 +129,27 @@ docker-machine ssh image-search-webapp
 docker exec -it image-search-webapp bash
 ```
 
+
+## Auto deploy using CircleCI
+
+* Status: https://circleci.com/gh/kenalib/workflows/image-search-java
+
 ### Setup CircleCI 2.0 and docker-compose
 
-* auto deploy by `docker-compose up -d` (c.f. `.circleci/config.yml`)
+* Test build deploy processes are automated on CircleCI 2.0
+* see `.circleci/config.yml` for auto deploy using `docker-compose`
 * need following environment variables in CircleCI settings
 
 ```bash
 # for image search
 ACCESS_KEY_ID
 ACCESS_KEY_SECRET
+
 # c.f. docker-machine env image-search-webapp
 DOCKER_TLS_VERIFY=1
 DOCKER_CERT_PATH=.
 DOCKER_HOST
+
 # .pem files content
 DOCKER_CA_PEM
 DOCKER_CERT_PEM
@@ -143,7 +158,7 @@ DOCKER_KEY_PEM
 
 * run `docker-machine env image-search-webapp` to show actual variables.
 * for each PEM files, you can copy data to clipboard by below on Mac.
-* paste to Value field then delete header and footer.
+* paste to Value field then delete header and footer in the field.
 
 ```bash
 cat ~/.docker/machine/machines/image-search-webapp/ca.pem | pbcopy
@@ -160,9 +175,7 @@ docker-machine rm image-search-webapp
 ```
 
 
-## Note
-
-* `@WebServlet("/search_picture")` により `WEB-INF/web.xml` の servlet 定義は不要。
+## Misc Note
 
 ### Maven project from scratch
 
@@ -186,4 +199,6 @@ apt-get install docker-ce=18.03.1~ce-0~ubuntu
 
 * https://www.alibabacloud.com/help/doc-detail/71238.htm
 * https://docs.docker.com/install/linux/docker-ce/ubuntu/
+* https://circleci.com/
+* https://github.com/mockito/mockito
 * https://github.com/kenalib/image-search-react
