@@ -1,9 +1,11 @@
 version: '3'
 services:
   web:
-    build: .
-    image: my-tomcat
-    container_name: image-search-webapp
+    image: maven:3.5-alpine
+    container_name: image-search-test
+    volumes:
+      - .:/usr/src/mymaven
+    working_dir: /usr/src/mymaven
     ports: 
       - "80:8080"
     environment:    # import env vars from terminal env vars

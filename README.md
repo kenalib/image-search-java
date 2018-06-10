@@ -1,6 +1,11 @@
 
 # Image Search Java Sample Web API
 
+
+CircleCI Status:
+[![CircleCI](https://circleci.com/gh/kenalib/image-search-java.svg?style=svg)](https://circleci.com/gh/kenalib/image-search-java)
+
+
 ## Sample UI
 
 * https://github.com/kenalib/image-search-react
@@ -32,8 +37,11 @@ export ACCESS_KEY_SECRET=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 ### Create WAR file
 
 ```bash
+mvn test
 # this will create target/image-search-webapp.war
 mvn package
+# this will skip test
+mvn package -DskipTests
 ```
 
 ### Run Tomcat locally
@@ -47,6 +55,10 @@ open http://localhost:8080/image-search-webapp/check.html
 ```
 
 ### Run Tomcat by Docker
+
+```bash
+docker-compose -f docker-compose.test.yml run web mvn test
+```
 
 ```bash
 docker-compose up -d
@@ -96,15 +108,45 @@ docker-machine ls
 ```bash
 eval $(docker-machine env image-search-webapp)
 docker-compose up -d
+
 docker-compose ps
 docker-compose logs -f web
+
 IP=$(docker-machine ip image-search-webapp)
 curl http://${IP}/image-search-webapp/search_picture | python -m json.tool
 open http://${IP}/image-search-webapp/check.html
+
 # ssh to the machine for debug
 docker-machine ssh image-search-webapp
 # go into container for debug
 docker exec -it image-search-webapp bash
+```
+
+### Setup CircleCI 2.0 and docker-compose
+
+* auto deploy by `docker-compose up -d` (c.f. `.circleci/config.yml`)
+* need following environment variables in CircleCI settings
+
+```bash
+# for image search
+ACCESS_KEY_ID
+ACCESS_KEY_SECRET
+# c.f. docker-machine env image-search-webapp
+DOCKER_TLS_VERIFY=1
+DOCKER_CERT_PATH=.
+DOCKER_HOST
+# .pem files content
+DOCKER_CA_PEM
+DOCKER_CERT_PEM
+DOCKER_KEY_PEM
+```
+
+* run `docker-machine env image-search-webapp` to show actual variables.
+* for each PEM files, you can copy data to clipboard by below on Mac.
+* paste to Value field then delete header and footer.
+
+```bash
+cat ~/.docker/machine/machines/image-search-webapp/ca.pem | pbcopy
 ```
 
 ### Clean up
