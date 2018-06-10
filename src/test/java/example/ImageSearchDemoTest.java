@@ -4,6 +4,7 @@ import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.imagesearch.model.v20180319.SearchItemResponse;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
@@ -18,7 +19,7 @@ public class ImageSearchDemoTest {
     private int auctionSize;
 
     @org.junit.Before
-    public void setUp() throws ClientException {
+    public void setUp() throws ClientException, IOException {
         demo = new ImageSearchDemo();
     }
 
@@ -93,6 +94,19 @@ public class ImageSearchDemoTest {
         SearchItemResponse response = demo.searchPictureWithResize(is);
         assertEquals(true, response.getSuccess());
         assertEquals("success", response.getMessage());
+
+        bytes = new byte[0];
+        is = new ByteArrayInputStream(bytes);
+        response = demo.searchPictureWithResize(is);
+
+        assertEquals("request.buildPostContent() failed.", response.getMessage());
+
+        // not image but text data
+        bytes = Resources.getBytes("image-search.properties");
+        is = new ByteArrayInputStream(bytes);
+        response = demo.searchPictureWithResize(is);
+
+        assertEquals("ERR: ImageIO.read null", response.getMessage());
     }
 
     @org.junit.Test

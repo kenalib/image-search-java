@@ -18,7 +18,7 @@ class ImageSearchDemo {
     private Properties props;
     private IAcsClient client;
 
-    ImageSearchDemo() throws ClientException {
+    ImageSearchDemo() throws ClientException, IOException {
         String accessKeyId = System.getenv("ACCESS_KEY_ID");
         String accessKeySecret = System.getenv("ACCESS_KEY_SECRET");
 
@@ -60,6 +60,10 @@ class ImageSearchDemo {
             } else {
                 BufferedImage bImage = ImageIO.read(inputStream);
 
+                if (bImage == null) {
+                    throw new IOException("ERR: ImageIO.read null");
+                }
+
                 int originalWidth = bImage.getWidth();
                 int originalHeight = bImage.getHeight();
 
@@ -76,10 +80,8 @@ class ImageSearchDemo {
             }
         } catch (IOException e) {
             e.printStackTrace();
-            String message = "ERR: image resize failed.";
-            System.out.println(message);
-
-            return createErrorResponse(message);
+            System.out.println(e.getMessage());
+            return createErrorResponse(e.getMessage());
         }
 
         return searchPicture(bytes, catId);

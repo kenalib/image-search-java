@@ -6,15 +6,11 @@ import java.io.InputStream;
 class Properties {
     private java.util.Properties properties;
 
-    Properties(String fileName) {
-        properties = new java.util.Properties();
+    Properties(String fileName) throws IOException {
+        InputStream is = Resources.getInputStream(fileName);
 
-        try {
-            InputStream is = Resources.getInputStream(fileName);
-            properties.load(is);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        properties = new java.util.Properties();
+        properties.load(is);
     }
 
     String get(String key) {
